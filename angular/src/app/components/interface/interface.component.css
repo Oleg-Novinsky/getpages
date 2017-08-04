@@ -1,0 +1,150 @@
+.{
+  margin: 0;
+  padding: 0;
+  z-index: 100;
+}
+h4 {
+  font-size: 1em;
+  width: 70%;
+  margin-left: 15%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+h3 {
+  font-size: 1.2em;
+  width: 70%;
+  margin-left: 15%;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+.message{
+  width: 50%;
+  margin-left: 25%;
+  text-align: center;
+  border-radius: 3px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  z-index: 200;
+  position: fixed;
+  opacity: 0.95;
+  top: 0;
+  left: 0;
+}
+.ok{
+  color: black;
+  background-color: #6EFF70;
+  border: 2px solid green;
+}
+.nok{
+  color: black;
+  background-color: #ff6666;
+  border: 2px solid red;
+}
+.choiceButtons{
+  text-align: center;
+  margin-bottom: 20px;
+}
+.choiceButtons button{
+  padding: 5px;
+}
+.overlay{
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.7;
+  display: block;
+  z-index: 101;
+  position: fixed;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+#modal{
+  width: 30%;
+  margin-left: 35%;
+  height: auto;
+  overflow: hidden;
+  border: 1px solid black;
+  border-radius: 3px;
+  background-color: white;
+  display: block;
+  z-index: 102;
+  position: fixed;
+  top: 25%;
+  left: 0;
+  box-shadow: 0 0 3px 2px black;
+}
+
+ul li{
+  list-style: none;
+  text-align: center;
+}
+i {
+  cursor: pointer;
+  color: Red;
+  transition: 0.3s;
+}
+i:hover{
+  color: FireBrick;
+}
+.headers ul li{
+  margin: 0;
+  padding: 0;
+  font-size: 1.3em;
+  border-bottom: 1px solid gray;
+}
+#modal form button{
+  width: 10%;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+.closeModal{
+  color: red;
+  text-align: right;
+  margin-bottom: 10px;
+  padding-right: 25px;
+}
+.iButton{
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  float: left;
+}
+#modal form.inputForm{
+  width: 60%;
+  margin-left: 20%;
+}
+.form-group input, select, span{
+  margin: 10px;
+  width: 50%;
+  margin-left: 25%;
+}
+.categoryList ul li {
+  padding: 5px;
+  text-align: left;
+  font-size: 1.2em;
+}
+.categoryList ul li a{
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+.categoryList ul li a:hover{
+  color: gray;
+  transition: 0.3s;
+}
+.productList ul li {
+  margin-top: 5px;
+}
+.buttonsGrid button{
+  width: 80%;
+  margin-left: 10%;
+}
+.currentCategory{
+  text-align: center;
+}
+.currentCategory p{
+  font-family: cursive;
+}

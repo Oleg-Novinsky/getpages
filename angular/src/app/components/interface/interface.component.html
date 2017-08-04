@@ -1,0 +1,133 @@
+<div class="message" *ngIf="messageIsShown" [ngClass]="messageType">{{messageMsg}}</div>
+<div *ngIf="isModal" class="overlay" (click)="togleModal()"></div>
+
+<div id="modal" *ngIf="isModal">
+
+  <form (submit)="onAddProduct()" class="form-group" id="modalAddProduct" *ngIf="isModalAddProduct">
+    <div class="closeModal col-sm-12 col-md-12 col-lg-12">
+        <i (click)="togleModal()" class="fa fa-times fa-lg" aria-hidden="true"></i>
+    </div>
+    <h3>Добавить товар</h3>
+    <select [(ngModel)]="productCategory" name="productCategory" class="form-control">
+        <option>Выберите категорию</option>
+        <option *ngFor="let category of categories">{{category.name}}</option>
+    </select>
+    <input type="text" [(ngModel)]="productName" name="productName" placeholder="Название" class="form-control" required />
+    <input type="number" [(ngModel)]="productPPrice" name="productPPrice" placeholder="Закупочная стоимость" class="form-control" required />
+    <input type="number" [(ngModel)]="productSPrice" name="productSPrice" placeholder="Розничная цена" class="form-control" required />
+    <input type="submit" value="Сохранить" class="inputForm" />
+<br>
+  </form>
+
+  <form (submit)="onEditProduct(product)" class="form-group" id="modalEditProduct" *ngIf="isModalEditProduct" >
+    <div class="closeModal col-sm-12 col-md-12 col-lg-12">
+        <i (click)="togleModal()" class="fa fa-times fa-lg" aria-hidden="true"></i>
+    </div>
+    <h3>Изменить товар</h3>
+    <select [(ngModel)]="boundProduct.category" name="category" class="form-control">
+        <option>Выберите категорию</option>
+        <option *ngFor="let category of categories">{{category.name}}</option>
+    </select>
+    <input type="text" [(ngModel)]="boundProduct.name" name="name" placeholder="Название" class="form-control" disabled />
+    <input type="number" [(ngModel)]="boundProduct.pPrice" name="pPrice" placeholder="Закупочная стоимость" class="form-control" disabled />
+    <input type="number" [(ngModel)]="boundProduct.sPrice" name="sPrice" placeholder="Розничная цена" class="form-control" disabled />
+    <input type="submit" value="Сохранить" class="inputForm"  />
+<br>
+  </form>
+
+  <form (submit)="onAddCategory()" class="form-group" id="modalAddCategory" *ngIf="isModalAddCategory">
+    <div class="closeModal col-sm-12 col-md-12 col-lg-12">
+        <i (click)="togleModal()" class="fa fa-times fa-lg" aria-hidden="true"></i>
+    </div>
+    <h3>Добавить категорию</h3>
+    <input type="text" [(ngModel)]="boundAddCategory.name" name="boundAddCategory" placeholder="Название" class="form-control" required />
+    <input type="submit" value="Сохранить"  class="inputForm" />
+<br>
+  </form>
+
+  <form (submit)="onDeleteCategory()" class="form-group" id="modalDeleteCategory" *ngIf="isModalDeleteCategory">
+    <h3>Вы действительно хотите удалить категорию "{{boundCategory.name}}"?</h3>
+    <h4>Все товары в этой категории будут помечены как "Без категории".</h4>
+    <div class="choiceButtons col-sm-12 col-md-12 col-lg-12">
+      <button (click)="onDeleteCategory()" class="btn btn-default btn-md">Да</button>
+      <button (click)="togleModal()" class="btn btn-default btn-md">Нет</button>
+    </div>
+  </form>
+
+  <form (submit)="onDeleteProduct()" class="form-group" id="modalDeleteProduct" *ngIf="isModalDeleteProduct">
+    <h3>Вы действительно хотите удалить товар "id {{boundProduct.id}}"?</h3>
+    <div class="choiceButtons col-sm-12 col-md-12 col-lg-12">
+      <button (click)="onDeleteProduct()" class="btn btn-default btn-md">Да</button>
+      <button (click)="togleModal()" class="btn btn-default btn-md">Нет</button>
+    </div>
+  </form>
+<br>
+</div>
+
+<div class="container">
+    <div class="col-sm-12 col-md-12 col-lg-12" style="margin-left: 40px; margin-top: 100px; margin-bottom: 40px;">
+    <div class="col-sm-3 col-md-3 col-lg-3">
+		
+	</div>
+    <div class="col-sm-9 col-md-9 col-lg-9">
+      <button (click)="onModalAddProduct()" class="col-sm-3 col-md-3 col-lg-3 btn btn-default btn-md">Добавить товар</button>
+      <button (click)="onModalAddCategory()"  class="col-sm-3 col-md-3 col-lg-3 btn btn-default btn-md">Добавить категорию</button>
+      <div class="currentCategory">Текущая категория: <p>{{boundCategory.name}}</p></div>
+    </div>
+  </div>
+
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <div class="col-sm-3 col-md-3 col-lg-3"></div>
+    <div class="headers col-sm-9 col-md-9 col-lg-9">
+      <ul>
+        <li class="col-sm-1 col-md-1 col-lg-1">ID</li>
+        <li class="col-sm-3 col-md-3 col-lg-3">Название товара</li>
+        <li class="col-sm-2 col-md-2 col-lg-2">Цена закупки</li>
+        <li class="col-sm-2 col-md-1 col-lg-2">Цена продажи</li>
+        <li class="col-sm-4 col-md-4 col-lg-4"><br></li>
+      </ul>
+
+    </div>
+  </div>
+  <div class="categoryList col-sm-3 col-md-3 col-lg-3">
+    <ul *ngFor="let category of categories">
+      <li>
+        <div class="col-sm-3 col-md-3 col-lg-3">
+        <i (click)="onModalDeleteCategory(category)" class="fa fa-times" aria-hidden="true"></i>
+        </div>
+        <div class="col-sm-9 col-md-9 col-lg-9">
+          <a (click)="onGetProducts(category)">{{category.name}}</a>
+        </div>
+      </li>
+    </ul>
+    <ul>
+      <li class="col-sm-3 col-md-3 col-lg-3"></li>
+      <li class="col-sm-9 col-md-9 col-lg-9" style="padding-left: 15px;">
+        <a (click)="onGetProducts('Без категории')">Без категории</a>
+      </li>
+    </ul>
+  </div>
+  <div class="productList col-sm-9 col-md-9 col-lg-9">
+    <ul *ngFor="let product of products">
+      <li class="col-sm-1 col-md-1 col-lg-1">
+        {{product.id}}
+      </li>
+      <li class="col-sm-3 col-md-3 col-lg-3">
+        {{product.name}}
+      </li>
+      <li class="col-sm-2 col-md-2 col-lg-2">
+        {{product.pPrice}}
+      </li>
+      <li class="col-sm-2 col-md-2 col-lg-2">
+        {{product.sPrice}}
+      </li>
+      <li class="col-sm-2 col-md-2 col-lg-2 buttonsGrid">
+        <button (click)="onModalDeleteProduct(product)" class="btn btn-danger btn-xs">Удалить</button>
+      </li>
+      <li class="col-sm-2 col-md-2 col-lg-2 buttonsGrid">
+        <button (click)="onModalEditProduct(product)" class="btn btn-warning btn-xs">Изменить</button>
+      </li>
+    </ul>
+	<div *ngIf="emptyList" style="padding: 30px;">В данной категории товары отсутствуют</div>
+  </div>
+</div>
