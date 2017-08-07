@@ -3,9 +3,13 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
 const app = express();
 const  products = require('./routes/products');
+const  getpages = require('./routes/getpages');
 const config = require('./config/database');
+
+const needle = require('needle');
 
 // Mongoose
 mongoose.Promise = global.Promise;
@@ -24,13 +28,15 @@ const port = 3001;
 // Cors
 app.use(cors());
 
+
 //Static folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // BodyParser
 app.use(bodyParser.json());
 
-app.use('/products', products)
+app.use('/products', products);
+app.use('/getpages', getpages);
 
 // Index Route
 app.get('/', (req, res) => {

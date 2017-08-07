@@ -8,15 +8,22 @@ import { AppComponent } from './app.component';
 import { InterfaceComponent } from './components/interface/interface.component';
 
 import {ProductsService} from './services/products.service';
+import {GetpagesService} from './services/getpages.service';
+import { LoginComponent } from './components/login/login.component';
+import { GetpagesComponent } from './components/getpages/getpages.component';
 
 const appRoutes: Routes = [
-  {path: '', component: InterfaceComponent}
+  {path: '', component: InterfaceComponent},
+  {path: 'login', component: LoginComponent},
+  {path: 'getpages', component: GetpagesComponent}
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    InterfaceComponent
+    InterfaceComponent,
+    LoginComponent,
+    GetpagesComponent
   ],
   imports: [
     BrowserModule,
@@ -24,7 +31,7 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ProductsService],
+  providers: [ProductsService, GetpagesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

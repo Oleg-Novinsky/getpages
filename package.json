@@ -9,12 +9,16 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "*",
+    "cheerio": "^1.0.0-rc.2",
     "cors": "*",
     "express": "*",
+    "iconv-lite": "^0.4.18",
     "jsonwebtoken": "*",
     "mongoose": "*",
+    "needle": "^1.6.0",
     "passport": "^0.3.2",
-    "passport-jwt": "^2.2.1"
+    "passport-jwt": "^2.2.1",
+    "request": "^2.81.0"
   },
   "author": "Oleg Novinsky",
   "license": "ISC"
