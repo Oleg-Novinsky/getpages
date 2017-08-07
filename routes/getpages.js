@@ -4,34 +4,33 @@ const jwt = require('jsonwebtoken');
 
 const request = require('request');
 const cheerio = require('cheerio');
+var Promise = require("bluebird");
 
   // Получаем запрос
   router.post('/getparsed', function(req, res){
-    let urlArr = req.body.data;
-    let resultAll = [];
-    let result = [];
-    /*
-    // Получаем массив всех слов по каждому сайту
-    for (let i = 0; i < urlArr.length; i++){
-      let siteResult = parseSingle(urlArr[i]);
-      resultAll.push(siteResult);
-    }
-    // Получаем три наиболее частых по каждому сайту
-    for (let i = 0; i < resultAll.length; i++){
-      let words = getMostRepeating(resultAll[i]);
-      let item = {
-        site: urlArr[i],
-        words: words
-      };
-      result.push(item);
-    }
-*/
-    let item = {
-      site: urlArr[0],
-      words: "words"
-    };
-    res.send({"data" : item}); // {"data" : result}
-  });
+
+     let urlList = req.body.data;
+
+     var request = Promise.promisifyAll(require("request"), {multiArgs: true});
+
+      Promise.map(urlList, function(url) {
+          return request.getAsync(url).spread(function(response,body) {
+            let $ = cheerio.load(body);
+            let a = $("a").text();
+            let str = a.split(" ");
+            let accurate = toFormat(str);
+            return accurate;
+          });
+      }).then(function(results) {
+           // results is an array of all the parsed bodies in order
+           res.send({data: results});
+      }).catch(function(err) {
+           // handle error here
+           res.send({data: err});
+      });
+
+
+   });
 
 //==========
   function getMostRepeating(arr){
@@ -70,14 +69,15 @@ const cheerio = require('cheerio');
   return mostRepeating;
   }
 
+
 function parseSingle(url){
-  request(url, function (error, response, html) {
+  request('http://foxnews.com/', function (error, response, html) {
     if (!error && response.statusCode == 200) {
       let $ = cheerio.load(html);
       let a = $("a").text();
       let str = a.split(" ");
       let accurate = toFormat(str);
-      return accurate;
+
     } else{
       return ["Error: Bad response from "+url];
     }
@@ -89,7 +89,7 @@ function toFormat(arr){
   for (let i = 0; i < arr.length; i++){
     let str = trimmer(arr[i]);
     if(str.length > 4){
-        result.push(str.toLowerCase());
+        result.push(str); //.toLowerCase()
     }
   }
   return result;

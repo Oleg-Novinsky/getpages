@@ -1,32 +1,22 @@
-<input [(ngModel)]="inputOne" name="inputOne" type="text" />
 
 <input [(ngModel)]="inputTwo" name="inputTwo" type="text" />
-
-<button (click)="doCheck()">Check</button>
-
-<p>
-  Result: {{RegExpResult}}
-</p>
-
 
 
 
 <div>
   <button (click)="getFromRouter()">getFromRouter</button>
   getFromRouter:
-
-
+  <br />
 </div>
-<!--
+
 <div>
   Array:
   <br />
-  <ul>
+  <ul >
     <li *ngFor="let item of fromRouter.data">
-      Site: {{item.site}}
-      <br />
-      Words: {{item.words}}
+      <p *ngFor="let i of item">
+        {{i}}
+      </p>
     </li>
   </ul>
 </div>
--->
