@@ -36,25 +36,16 @@ function tgtrimm(str){
 }
 
 this.RegExpResult.push(tgtrimm(str));
-/*
-var Reg6 = new RegExp("^[A-zА-яЁё]+$");
-var Reg61 = new RegExp("^.*[^A-zА-яЁё].*$");
-if(Reg6.test(str))
-{
- console.log("first");
- if(Reg61.test(str))
- {
- console.log("second");
- }
-}
-*/
-//console.log(this.RegExpResult);
+
 }
 
 getFromRouter(){
+  let arr = [];
+  arr.push(this.inputTwo);
   let rq = {
-    name: "something"
+    data: arr
   }
+  console.log(rq.data);
   this.getpagesService.getFromRouter(rq).subscribe(data => {
     this.fromRouter = data;
     console.log(data);
