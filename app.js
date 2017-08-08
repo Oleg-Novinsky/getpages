@@ -9,8 +9,6 @@ const  products = require('./routes/products');
 const  getpages = require('./routes/getpages');
 const config = require('./config/database');
 
-const needle = require('needle');
-
 // Mongoose
 mongoose.Promise = global.Promise;
 mongoose.connect(config.database);

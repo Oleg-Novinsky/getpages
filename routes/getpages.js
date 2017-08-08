@@ -6,12 +6,31 @@ const request = require('request');
 const cheerio = require('cheerio');
 var Promise = require("bluebird");
 
+var PDF = require('pdfkit');
+var fs = require('fs');
+
   // Получаем запрос
+
+  router.post('/download', function(req, res){
+    let filename = req.body.filename;
+    let file = './files/'+filename+'.pdf';
+    res.download(file);
+  });
+
+  router.post('/getpdf', function(req, res){
+
+    let fileName = generateFileName();
+    let text = fileName;
+    let doc = new PDF();
+    doc.pipe(fs.createWriteStream('./files/'+fileName+'.pdf'));
+    doc.text(text, 100, 100);
+    doc.end();
+    res.send({filename: fileName});
+  });
+
   router.post('/getparsed', function(req, res){
-
      let urlList = req.body.data;
-
-     var request = Promise.promisifyAll(require("request"), {multiArgs: true});
+     let request = Promise.promisifyAll(require("request"), {multiArgs: true});
 
       Promise.map(urlList, function(url) {
           return request.getAsync(url).spread(function(response,body) {
@@ -69,21 +88,6 @@ var Promise = require("bluebird");
   return mostRepeating;
   }
 
-
-function parseSingle(url){
-  request('http://foxnews.com/', function (error, response, html) {
-    if (!error && response.statusCode == 200) {
-      let $ = cheerio.load(html);
-      let a = $("a").text();
-      let str = a.split(" ");
-      let accurate = toFormat(str);
-
-    } else{
-      return ["Error: Bad response from "+url];
-    }
-  });
-}
-
 function toFormat(arr){
   let result = [];
   for (let i = 0; i < arr.length; i++){
@@ -100,6 +104,14 @@ function trimmer(str){
   return result;
 }
 
+function generateFileName(){
+  let str = "";
+  let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < 20; i++){
+    str += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return str;
+}
 
 
 
