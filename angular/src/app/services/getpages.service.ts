@@ -16,17 +16,17 @@ export class GetpagesService {
   ) { }
 
 
-  getFromRouter(data) {
+  getDataFromPages(data) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    return this.http.post('http://'+ipConnection+'/getpages/getparsed', data, {headers: headers})
+    return this.http.post('http://'+ipConnection+'/getpages/getdatafrompages', data, {headers: headers})
     .map(res => res.json());
   }
 
   gneratePdf(data) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    return this.http.post('http://'+ipConnection+'/getpages/getpdf', data, {headers: headers})
+    return this.http.post('http://'+ipConnection+'/getpages/generatepdf', data, {headers: headers})
     .map(res => res.json());
   }
 

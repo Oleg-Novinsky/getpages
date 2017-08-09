@@ -1,28 +1,9 @@
 
-<input [(ngModel)]="inputTwo" name="inputTwo" type="text" />
-
+<input [(ngModel)]="inputNoRepeat" name="inputNoRepeat" type="text" />
 <br />
-<button (click)="generatePdf()">generate</button>
-
-<br />
-<button (click)="getPdf()">Download</button>
-
-
-
-<div>
-  <button (click)="getFromRouter()">getFromRouter</button>
-  getFromRouter:
+<p>
+  Error code: {{errorMessage.reason}}
   <br />
-</div>
-
-<div>
-  Array:
-  <br />
-  <ul >
-    <li *ngFor="let item of fromRouter.data">
-      <p *ngFor="let i of item">
-        {{i}}
-      </p>
-    </li>
-  </ul>
-</div>
+  Error reason: {{errorMessage.hostname}}
+</p>
+<button (click)="getDataFromPages()">getDataFromPages</button>

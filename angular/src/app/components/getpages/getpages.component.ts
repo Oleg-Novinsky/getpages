@@ -11,11 +11,11 @@ const FileSaver = require('file-saver');
 })
 export class GetpagesComponent implements OnInit {
 
-  parsedPages = [];
-  inputOne: String;
-  inputTwo = "";
-  RegExpResult = [];
-  fromRouter = [];
+  inputNoRepeat = "";
+  errorMessage = {
+    code: "",
+    hostname: ""
+  };
 
   constructor(
     private router:Router,
@@ -27,17 +27,20 @@ export class GetpagesComponent implements OnInit {
   }
 
 
-getFromRouter(){
+getDataFromPages(){
   let arr = [];
-  //arr.push("http://foxnews.com/");
   arr.push("http://www.bbc.com/news");
+  arr.push("http://foxnews.com");
   let rq = {
     data: arr
   }
-  this.getpagesService.getFromRouter(rq).subscribe(data => {
-    this.fromRouter = data;
-    //console.log(data);
-  });
+    this.getpagesService.getDataFromPages(rq).subscribe(data => {
+      if (data.reason != undefined){
+        this.errorMessage = data;
+      } else{
+        this.generatePdf(data);
+      }
+    });
 }
 
 getPdf(filename) {
@@ -49,10 +52,7 @@ this.getpagesService.getPdf(filename)
     })
 }
 
-generatePdf(){
-  let rq = {
-    data: "arr"
-  }
+generatePdf(rq){
   this.getpagesService.gneratePdf(rq).subscribe(data => {
     this.getPdf(data);
   });
