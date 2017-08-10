@@ -4,10 +4,11 @@ const jwt = require('jsonwebtoken');
 
 const request = require('request');
 const cheerio = require('cheerio');
-var Promise = require("bluebird");
+const Promise = require("bluebird");
 
-var PDF = require('pdfkit');
-var fs = require('fs');
+const PDF = require('pdfkit');
+const fs = require('fs');
+const minWordSize = 4;
 
   router.post('/getdatafrompages', function(req, res){
      let urlList = req.body.data;
@@ -21,6 +22,7 @@ var fs = require('fs');
             for (let tag = 0; tag < tags.length; tag++){
               let arr = $(tags[tag]).text().split(" ");
               arr = toFormat(arr);
+              arr = fixArray(arr);
               resultFromEachTag.push(arr);
             }
             let rsp = getMostRepeating(resultFromEachTag);
@@ -38,8 +40,6 @@ var fs = require('fs');
              hostname: err.cause.hostname
            });
       });
-
-
    });
 
    router.post('/generatepdf', function(req, res){
@@ -47,13 +47,24 @@ var fs = require('fs');
      let urls = req.body.urls;
      let fileName = generateFileName();
 
-     let doc = new PDF();
-     doc.pipe(fs.createWriteStream('./files/'+fileName+'.pdf'));
-     for (let i = 0; i < urls.length; i++){
-       doc.text("Site: "+urls[i]+" Words: "+content[i]);
+     try{
+
+       let doc = new PDF();
+       doc.pipe(fs.createWriteStream('./files/'+fileName+'.pdf'));
+       let lineHeigth = 50;
+       for (let i = 0; i < urls.length; i++){
+         //doc.text("Site: "+urls[i]+" Words: "+content[i]);
+         doc.text("Site: "+urls[i], 50, lineHeigth+15);
+         doc.text("Words: "+content[i], 300, lineHeigth+15);
+         lineHeigth+=15;
+       }
+       doc.end();
+       res.send({filename: fileName});
+       
+     } catch (err){
+       res.send({error: err});
      }
-     doc.end();
-     res.send({filename: fileName});
+
    });
 
    router.post('/download', function(req, res){
@@ -106,8 +117,8 @@ function toFormat(arr){
   let result = [];
   for (let i = 0; i < arr.length; i++){
     let str = trimmer(arr[i]);
-    if(str.length > 4){
-        result.push(str); //.toLowerCase()
+    if(str.length > minWordSize){
+        result.push(str);
     }
   }
   return result;
@@ -125,6 +136,39 @@ function generateFileName(){
     str += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return str;
+}
+
+function fixArray(arr){
+	let resultingArray = [];
+	for (let i = 0; i < arr.length; i++){
+			let first = 0;
+			for (let k = 0; k < arr[i].length; k++){
+				if (k == 0){
+					continue;
+				} else if (isUpperCase(arr[i].charAt(k)) == false){
+  					if (k == arr[i].length-1){
+  						resultingArray.push(arr[i].substring(first, k+1));
+  					}
+					continue;
+				} else if (isUpperCase(arr[i].charAt(k)) == true){
+  					resultingArray.push(arr[i].substring(first, k));
+  					first = k;
+				}
+			}
+	}
+
+	function isUpperCase(symbol){
+		return symbol == symbol.toUpperCase();
+	}
+
+  let result = [];
+  for (let i = 0; i < resultingArray.length; i++){
+    if (resultingArray[i].length > minWordSize){
+      result.push(resultingArray[i].toLowerCase());
+    }
+  }
+
+	return result;
 }
 
 module.exports = router;

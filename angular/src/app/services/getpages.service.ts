@@ -15,7 +15,6 @@ export class GetpagesService {
     private http: Http
   ) { }
 
-
   getDataFromPages(data) {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
