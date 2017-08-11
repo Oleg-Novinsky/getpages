@@ -62,8 +62,8 @@ const minWordSize = 4;
          doc.text("Слова: "+content[i], 200, lineHeigth+30);
          lineHeigth+=30;
        }
-
        doc.end();
+       
        res.send({filename: fileName});
 
      } catch (err){

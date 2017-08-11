@@ -33,6 +33,69 @@ export class GetpagesComponent implements OnInit {
     this.addInput();
   }
 
+  // Отправляем массив с адресами на сервер
+  getDataFromPages(){
+      this.startLoading();
+      this.loadStatus = "Идет парсинг страниц...";
+      let rq = formSitesArray(this.sitesArr);
+
+      this.getpagesService.getDataFromPages(rq).subscribe(data => {
+        if (data.reason != undefined){
+          this.errorMessage = data;
+          this.loadStatus = "Не удалось распарсить одну или более страниц. "+"Reason: "+data.reason+", Hostname: "+data.hostname;
+          this.stopLoading();
+        } else{
+
+          this.generatePdf(data);
+          this.loadStatus = "Создание PDF файла...";
+        }
+      });
+
+      function formSitesArray(sitesArr){
+        let arr = [];
+        for (let i = 0; i < sitesArr.length; i++){
+          if (sitesArr[i].site.indexOf("http://") < 0){
+            let str = "http://"+sitesArr[i].site;
+            arr.push(str);
+            continue;
+          }
+          arr.push(sitesArr[i].site);
+        }
+        return {data: arr};
+      }
+  }
+
+  // Создание PDF файл
+  generatePdf(rq){
+    this.getpagesService.gneratePdf(rq).subscribe(data => {
+      if (data.error != undefined){
+        this.loadStatus = "Не удалось сгенерировать PDF файл";
+        this.stopLoading();
+      } else{
+
+        this.delayDownloading(data);
+        this.loadStatus = "Загрузка PDF файла...";
+      }
+    });
+  }
+
+// Ждем, пока файл окончательно сформируется
+  delayDownloading(data){
+    let scope = this;
+    setTimeout(function(){scope.getPdf(data)}, 1000);
+  }
+
+  // Скачивание файла
+  getPdf(filename) {
+  this.getpagesService.getPdf(filename)
+      .subscribe(res => {
+          FileSaver.saveAs(res,"Result.pdf");
+          let fileURL = URL.createObjectURL(res);
+          window.open(fileURL);
+          this.stopLoading();
+      })
+  }
+
 // Индикация загрузки
 startLoading(){
   if (this.isLoading == false){
@@ -74,61 +137,6 @@ addInput(){
     }
     return str;
   }
-}
-
-// Отправляем массив с адресами на сервер
-getDataFromPages(){
-    this.startLoading();
-    this.loadStatus = "Идет парсинг страниц...";
-    let rq = formSitesArray(this.sitesArr);
-
-    this.getpagesService.getDataFromPages(rq).subscribe(data => {
-      if (data.reason != undefined){
-        this.errorMessage = data;
-        this.loadStatus = "Не удалось распарсить одну или более страниц. "+"Reason: "+data.reason+", Hostname: "+data.hostname;
-        this.stopLoading();
-      } else{
-        this.generatePdf(data);
-        this.loadStatus = "Создание PDF файла...";
-      }
-    });
-
-    function formSitesArray(sitesArr){
-      let arr = [];
-      for (let i = 0; i < sitesArr.length; i++){
-        if (sitesArr[i].site.indexOf("http://") < 0){
-          let str = "http://"+sitesArr[i].site;
-          arr.push(str);
-          continue;
-        }
-        arr.push(sitesArr[i].site);
-      }
-      return {data: arr};
-    }
-}
-
-// Создание PDF файл
-generatePdf(rq){
-  this.getpagesService.gneratePdf(rq).subscribe(data => {
-    if (data.error != undefined){
-      this.loadStatus = "Не удалось сгенерировать PDF файл";
-      this.stopLoading();
-    } else{
-      this.getPdf(data);
-      this.loadStatus = "Загрузка PDF файла...";
-    }
-  });
-}
-
-// Скачивание файла
-getPdf(filename) {
-this.getpagesService.getPdf(filename)
-    .subscribe(res => {
-        FileSaver.saveAs(res,"Result.pdf");
-        let fileURL = URL.createObjectURL(res);
-        window.open(fileURL);
-        this.stopLoading();
-    })
 }
 
 onLogout(){
