@@ -3,10 +3,22 @@
   margin: 0;
   padding: 0;
 }
-input, .buttons {
+input, .buttons, .logout {
   width: 70%;
   margin-top:20px;
   margin-left: 15%;
+  overflow: hidden;
+}
+.logout i{
+  float: right;
+  color: black;
+  font-size: 1.2em;
+}
+.logout i:hover{
+  color: gray;
+}
+.inputLines input{
+  padding-left: 10px;
 }
 i {
   color: #cc0000;

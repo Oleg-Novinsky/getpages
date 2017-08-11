@@ -10,6 +10,7 @@ const PDF = require('pdfkit');
 const fs = require('fs');
 const minWordSize = 4;
 
+// Создаем массив промисов, парсим страницы, возвращаем массив с результатами
   router.post('/getdatafrompages', function(req, res){
      let urlList = req.body.data;
      let request = Promise.promisifyAll(require("request"), {multiArgs: true});
@@ -42,6 +43,7 @@ const minWordSize = 4;
       });
    });
 
+// Создание PDF файла
    router.post('/generatepdf', function(req, res){
      let content = req.body.data;
      let urls = req.body.urls;
@@ -51,29 +53,35 @@ const minWordSize = 4;
 
        let doc = new PDF();
        doc.pipe(fs.createWriteStream('./files/'+fileName+'.pdf'));
+       doc.registerFont('arialCustom', './fonts/arial.ttf');
+       doc.font('arialCustom');
+
        let lineHeigth = 50;
        for (let i = 0; i < urls.length; i++){
-         //doc.text("Site: "+urls[i]+" Words: "+content[i]);
-         doc.text("Site: "+urls[i], 50, lineHeigth+15);
-         doc.text("Words: "+content[i], 300, lineHeigth+15);
-         lineHeigth+=15;
+         doc.text(urls[i], 50, lineHeigth+30);
+         doc.text("Слова: "+content[i], 200, lineHeigth+30);
+         lineHeigth+=30;
        }
+
        doc.end();
        res.send({filename: fileName});
-       
+
      } catch (err){
        res.send({error: err});
      }
 
    });
 
+// Загрузка PDF на страницу клиента
    router.post('/download', function(req, res){
      let filename = req.body.filename;
      let file = './files/'+filename+'.pdf';
      res.download(file);
    });
 
-//==========
+//========== Вспомогательные функции =========//
+
+// Возвращает три самых часто повторяющихся слова
 function getMostRepeating(arr){
   let resultingArr = [];
   let resultingObj = {};
@@ -111,8 +119,7 @@ function getMostRepeating(arr){
   return mostRepeating;
 }
 
-//==============
-
+// Убирает все лишние символы
 function toFormat(arr){
   let result = [];
   for (let i = 0; i < arr.length; i++){
@@ -121,14 +128,16 @@ function toFormat(arr){
         result.push(str);
     }
   }
+
+  function trimmer(str){
+    let result = str.replace(/[^a-zA-ZА-Яа-яЁё]/gi,'').replace(/\s+/gi,', ');
+    return result;
+  }
+
   return result;
 }
 
-function trimmer(str){
-  let result = str.replace(/[^a-zA-ZА-Яа-яЁё]/gi,'').replace(/\s+/gi,', ');
-  return result;
-}
-
+// Создает имя файла
 function generateFileName(){
   let str = "";
   let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -138,6 +147,7 @@ function generateFileName(){
   return str;
 }
 
+// Распознает и парсит склееные слова
 function fixArray(arr){
 	let resultingArray = [];
 	for (let i = 0; i < arr.length; i++){

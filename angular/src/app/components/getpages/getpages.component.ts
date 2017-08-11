@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {GetpagesService} from '../../services/getpages.service';
+import {AuthService} from '../../services/auth.service';
 import {Http, Headers} from '@angular/http';
 import {Router} from '@angular/router';
+
 const FileSaver = require('file-saver');
 
 @Component({
@@ -11,24 +13,27 @@ const FileSaver = require('file-saver');
 })
 export class GetpagesComponent implements OnInit {
 
+// Переменные для привязки к шаблону
   sitesArr = [];
+  loadStatus = "";
+  isLoading = false;
   errorMessage = {
     code: "",
     hostname: ""
   };
-  loadStatus = "";
-  isLoading = false;
 
   constructor(
     private router:Router,
     private http:Http,
-    private getpagesService:GetpagesService
+    private getpagesService:GetpagesService,
+    private authService:AuthService
   ) { }
 
   ngOnInit() {
     this.addInput();
   }
 
+// Индикация загрузки
 startLoading(){
   if (this.isLoading == false){
     this.isLoading = true;
@@ -37,6 +42,12 @@ startLoading(){
   }
 }
 
+stopLoading(){
+  let scope = this;
+  setTimeout(function(){scope.isLoading = false}, 5000);
+}
+
+// Удаление поля ввода
 deleteInput(name){
     let newArr = [];
     for (let i = 0; i < this.sitesArr.length; i++){
@@ -47,13 +58,13 @@ deleteInput(name){
     this.sitesArr = newArr;
 }
 
+// Добавление поля ввода
 addInput(){
   let obj = {
     name: generateName(),
     site: ""
   };
-  this.sitesArr.push(obj);
-  this.sitesArr.reverse();
+  this.sitesArr.unshift(obj);
 
   function generateName(){
     let str = "";
@@ -65,11 +76,12 @@ addInput(){
   }
 }
 
+// Отправляем массив с адресами на сервер
 getDataFromPages(){
-
     this.startLoading();
     this.loadStatus = "Идет парсинг страниц...";
     let rq = formSitesArray(this.sitesArr);
+
     this.getpagesService.getDataFromPages(rq).subscribe(data => {
       if (data.reason != undefined){
         this.errorMessage = data;
@@ -84,22 +96,18 @@ getDataFromPages(){
     function formSitesArray(sitesArr){
       let arr = [];
       for (let i = 0; i < sitesArr.length; i++){
+        if (sitesArr[i].site.indexOf("http://") < 0){
+          let str = "http://"+sitesArr[i].site;
+          arr.push(str);
+          continue;
+        }
         arr.push(sitesArr[i].site);
       }
       return {data: arr};
     }
 }
 
-getPdf(filename) {
-this.getpagesService.getPdf(filename)
-    .subscribe(res => {
-        FileSaver.saveAs(res,"Result.pdf");
-        let fileURL = URL.createObjectURL(res);
-        window.open(fileURL);
-        this.stopLoading();
-    })
-}
-
+// Создание PDF файл
 generatePdf(rq){
   this.getpagesService.gneratePdf(rq).subscribe(data => {
     if (data.error != undefined){
@@ -112,11 +120,20 @@ generatePdf(rq){
   });
 }
 
-stopLoading(){
-  let scope = this;
-  setTimeout(function(){scope.isLoading = false}, 5000);
+// Скачивание файла
+getPdf(filename) {
+this.getpagesService.getPdf(filename)
+    .subscribe(res => {
+        FileSaver.saveAs(res,"Result.pdf");
+        let fileURL = URL.createObjectURL(res);
+        window.open(fileURL);
+        this.stopLoading();
+    })
 }
 
-
+onLogout(){
+  this.authService.logout();
+  this.router.navigate(['/login']);
+}
 
 }

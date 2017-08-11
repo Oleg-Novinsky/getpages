@@ -12,13 +12,16 @@
   </div>
 </div>
 
+<div class="logout">
+  <i (click)="onLogout()" class="fa fa-sign-out" aria-hidden="true">Выйти</i> 
+</div>
 
 <div class="buttons">
   <button (click)="getDataFromPages()" class="btn btn-success">Скачать PDF</button>
   <button (click)="addInput()" class="btn btn-default" style="float: right">Добавить сайт</button>
 </div>
 
-<div *ngFor="let item of sitesArr">
-  <input [(ngModel)]="item.site" name="item.name"/>
+<div *ngFor="let item of sitesArr" class="inputLines">
+  <input [(ngModel)]="item.site" name="item.name" placeholder="Введите адрес сайта"/>
   <i (click)="deleteInput(item.name)" class="fa fa-times fa-lg"></i>
 </div>

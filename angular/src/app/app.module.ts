@@ -5,23 +5,24 @@ import { HttpModule } from '@angular/http';
 import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { InterfaceComponent } from './components/interface/interface.component';
-
-import {ProductsService} from './services/products.service';
-import {GetpagesService} from './services/getpages.service';
 import { LoginComponent } from './components/login/login.component';
 import { GetpagesComponent } from './components/getpages/getpages.component';
 
+import {GetpagesService} from './services/getpages.service';
+import {AuthService} from './services/auth.service';
+import {ValidateService} from './services/validate.service';
+
+import {AuthGuard} from './guards/auth.guard';
+
 const appRoutes: Routes = [
-  {path: '', component: InterfaceComponent},
+  {path: '', component: GetpagesComponent, canActivate:[AuthGuard]},
   {path: 'login', component: LoginComponent},
-  {path: 'getpages', component: GetpagesComponent}
+  {path: 'getpages', component: GetpagesComponent, canActivate:[AuthGuard]}
 ];
 
 @NgModule({
   declarations: [
     AppComponent,
-    InterfaceComponent,
     LoginComponent,
     GetpagesComponent
   ],
@@ -31,7 +32,7 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [ProductsService, GetpagesService],
+  providers: [GetpagesService, ValidateService, AuthService, AuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

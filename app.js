@@ -5,7 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const app = express();
-const  products = require('./routes/products');
+const  users = require('./routes/user');
 const  getpages = require('./routes/getpages');
 const config = require('./config/database');
 
@@ -33,8 +33,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // BodyParser
 app.use(bodyParser.json());
 
-app.use('/products', products);
+// Routes
 app.use('/getpages', getpages);
+app.use('/users', users);
 
 // Index Route
 app.get('/', (req, res) => {
