@@ -15,22 +15,9 @@ export class GetpagesService {
     private http: Http
   ) { }
 
-  getDataFromPages(data) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    return this.http.post('http://'+ipConnection+'/getpages/getdatafrompages', data, {headers: headers})
-    .map(res => res.json());
-  }
 
-  gneratePdf(data) {
-    let headers = new Headers();
-    headers.append('Content-Type', 'application/json');
-    return this.http.post('http://'+ipConnection+'/getpages/generatepdf', data, {headers: headers})
-    .map(res => res.json());
-  }
-
-  getPdf(filename) {
-    return this.http.post('http://'+ipConnection+'/getpages/download',filename,
+  getPdf(rq) {
+    return this.http.post('http://'+ipConnection+'/getpages/getdatafrompages',rq,
                    { responseType: ResponseContentType.Blob })
       .map((res) => {
             return new Blob([res.blob()], { type: 'application/pdf' })

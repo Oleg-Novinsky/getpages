@@ -468,16 +468,12 @@ var GetpagesComponent = (function () {
         this.startLoading();
         this.loadStatus = "Идет парсинг страниц...";
         var rq = formSitesArray(this.sitesArr);
-        this.getpagesService.getDataFromPages(rq).subscribe(function (data) {
-            if (data.reason != undefined) {
-                _this.errorMessage = data;
-                _this.loadStatus = "Не удалось распарсить одну или более страниц. " + "Reason: " + data.reason + ", Hostname: " + data.hostname;
-                _this.stopLoading();
-            }
-            else {
-                _this.generatePdf(data);
-                _this.loadStatus = "Создание PDF файла...";
-            }
+        this.getpagesService.getPdf(rq).subscribe(function (data) {
+            FileSaver.saveAs(data, "Result.pdf");
+            var fileURL = URL.createObjectURL(data);
+            window.open(fileURL);
+            _this.stopLoading();
+            _this.loadStatus = "Создание PDF файла...";
         });
         function formSitesArray(sitesArr) {
             var arr = [];
@@ -491,31 +487,6 @@ var GetpagesComponent = (function () {
             }
             return { data: arr };
         }
-    };
-    // Создание PDF файл
-    GetpagesComponent.prototype.generatePdf = function (rq) {
-        var _this = this;
-        this.getpagesService.gneratePdf(rq).subscribe(function (data) {
-            if (data.error != undefined) {
-                _this.loadStatus = "Не удалось сгенерировать PDF файл";
-                _this.stopLoading();
-            }
-            else {
-                _this.getPdf(data);
-                _this.loadStatus = "Загрузка PDF файла...";
-            }
-        });
-    };
-    // Скачивание файла
-    GetpagesComponent.prototype.getPdf = function (filename) {
-        var _this = this;
-        this.getpagesService.getPdf(filename)
-            .subscribe(function (res) {
-            FileSaver.saveAs(res, "Result.pdf");
-            var fileURL = URL.createObjectURL(res);
-            window.open(fileURL);
-            _this.stopLoading();
-        });
     };
     GetpagesComponent.prototype.onLogout = function () {
         this.authService.logout();
@@ -763,20 +734,8 @@ var GetpagesService = (function () {
     function GetpagesService(http) {
         this.http = http;
     }
-    GetpagesService.prototype.getDataFromPages = function (data) {
-        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["Headers"]();
-        headers.append('Content-Type', 'application/json');
-        return this.http.post('http://' + ipConnection + '/getpages/getdatafrompages', data, { headers: headers })
-            .map(function (res) { return res.json(); });
-    };
-    GetpagesService.prototype.gneratePdf = function (data) {
-        var headers = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["Headers"]();
-        headers.append('Content-Type', 'application/json');
-        return this.http.post('http://' + ipConnection + '/getpages/generatepdf', data, { headers: headers })
-            .map(function (res) { return res.json(); });
-    };
-    GetpagesService.prototype.getPdf = function (filename) {
-        return this.http.post('http://' + ipConnection + '/getpages/download', filename, { responseType: __WEBPACK_IMPORTED_MODULE_1__angular_http__["ResponseContentType"].Blob })
+    GetpagesService.prototype.getPdf = function (rq) {
+        return this.http.post('http://' + ipConnection + '/getpages/getdatafrompages', rq, { responseType: __WEBPACK_IMPORTED_MODULE_1__angular_http__["ResponseContentType"].Blob })
             .map(function (res) {
             return new Blob([res.blob()], { type: 'application/pdf' });
         });

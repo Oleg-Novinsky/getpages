@@ -18,6 +18,13 @@ const minWordSize = 4;
       Promise.map(urlList, function(url) {
           return request.getAsync(url).spread(function(response,body) {
             let $ = cheerio.load(body);
+            /*
+            let arr = $("body").text().split(" ");
+            arr = toFormat(arr);
+            arr = fixArray(arr);
+            arr = getMostRepeating(arr);
+            */
+
             let tags = ["a", "p", "h1", "h2", "h3", "h4", "h5", "span"];
             let resultFromEachTag = [];
             for (let tag = 0; tag < tags.length; tag++){
@@ -26,57 +33,33 @@ const minWordSize = 4;
               arr = fixArray(arr);
               resultFromEachTag.push(arr);
             }
+
             let rsp = getMostRepeating(resultFromEachTag);
             return rsp;
 
           });
       }).then(function(results) {
-           // results is an array of all the parsed bodies in order
-           res.send({data: results, urls: urlList});
+
+           let doc = new PDF();
+           doc.registerFont('arialCustom', './fonts/arial.ttf');
+           doc.font('arialCustom');
+
+           let lineHeigth = 50;
+           for (let i = 0; i < urlList.length; i++){
+             doc.text(urlList[i], 50, lineHeigth+30);
+             doc.text("Слова: "+results[i], 200, lineHeigth+30);
+             lineHeigth+=30;
+           }
+
+           doc.pipe(res);
+           doc.end();
       }).catch(function(err) {
-           // handle error here
            res.send({
              err: err,
              reason: err.cause.code,
              hostname: err.cause.hostname
            });
       });
-   });
-
-// Создание PDF файла
-   router.post('/generatepdf', function(req, res){
-     let content = req.body.data;
-     let urls = req.body.urls;
-     let fileName = generateFileName();
-
-     try{
-
-       let doc = new PDF();
-       doc.pipe(fs.createWriteStream('./files/'+fileName+'.pdf'));
-       doc.registerFont('arialCustom', './fonts/arial.ttf');
-       doc.font('arialCustom');
-
-       let lineHeigth = 50;
-       for (let i = 0; i < urls.length; i++){
-         doc.text(urls[i], 50, lineHeigth+30);
-         doc.text("Слова: "+content[i], 200, lineHeigth+30);
-         lineHeigth+=30;
-       }
-       doc.end();
-       
-       res.send({filename: fileName});
-
-     } catch (err){
-       res.send({error: err});
-     }
-
-   });
-
-// Загрузка PDF на страницу клиента
-   router.post('/download', function(req, res){
-     let filename = req.body.filename;
-     let file = './files/'+filename+'.pdf';
-     res.download(file);
    });
 
 //========== Вспомогательные функции =========//
@@ -123,9 +106,9 @@ function getMostRepeating(arr){
 function toFormat(arr){
   let result = [];
   for (let i = 0; i < arr.length; i++){
-    let str = trimmer(arr[i]);
-    if(str.length > minWordSize){
-        result.push(str);
+    //let str = trimmer(arr[i]);
+    if(arr[i].length > minWordSize){
+        result.push(trimmer(arr[i]));
     }
   }
 
